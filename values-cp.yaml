@@ -27,7 +27,11 @@ env:
   pg_ssl: "on"
   
   # Kong Manager password
-  password: changeme
+  password:
+    valueFrom:
+      secretKeyRef:
+         name: kong-enterprise-superuser-password
+         key: password
   
 # Enterprise functionality
 enterprise:

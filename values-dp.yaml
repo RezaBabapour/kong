@@ -4,10 +4,17 @@ deployment:
   daemonset: true
   hostNetwork: true
 
+containerSecurityContext:
+  capabilities:
+    add: [NET_BIND_SERVICE]
+    drop: []
+  runAsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0
+
 # Do not use Kong Ingress Controller
 ingressController:
   enabled: false
-
 
 image:
   repository: kong/kong-gateway
@@ -30,7 +37,8 @@ env:
   lua_ssl_trusted_certificate: /etc/secrets/kong-cluster-cert/tls.crt
   cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
   cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
-  
+  nginx_worker_processes: auto
+
 # Enterprise functionality
 enterprise:
   enabled: true
@@ -43,7 +51,17 @@ proxy:
   http:
     enabled: true
     servicePort: 80
-    containerPort: 8000
+    containerPort: 80
+    parameters:
+    - http2
+    - reuseport
+  tls:
+    enabled: true
+    servicePort: 443
+    containerPort: 443
+    parameters:
+    - http2
+    - reuseport
 
 # These roles are served by the kong-cp deployment
 admin:
